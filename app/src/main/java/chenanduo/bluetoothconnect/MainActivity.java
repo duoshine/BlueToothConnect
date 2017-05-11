@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity implements KeysSelectDialog.
     private BluetoothGattCharacteristic notifyCharacteristic;
     private Button mBtnScan;
     private TextView mName;
-    private long mStartTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,17 +84,26 @@ public class MainActivity extends AppCompatActivity implements KeysSelectDialog.
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_searchkeys:
-                //点击搜索附近蓝牙设备
-                reSearchKeys();
+                startBluetooth();
                 break;
             case R.id.btnScan:
                 //点击搜索附近蓝牙设备
                 keysSelectDialog.showDialog();
-                reSearchKeys();
+                startBluetooth();
                 break;
             default:
                 break;
         }
+    }
+
+    private void startBluetooth() {
+        if (mBLE == null) {
+            return;
+        }
+        //点击搜索时确定蓝牙是否打开 如果没有打开提示用户打开蓝牙 如果已经是打开状态则不会开启
+        mBLE.isEnabled(MainActivity.this);
+        //点击搜索附近蓝牙设备
+        reSearchKeys();
     }
 
     //选择钥匙 或者 搜索钥匙
@@ -186,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements KeysSelectDialog.
         });
     }
 
-    //扫描结果回调  该方法被回调多次
+    //扫描结果回调  该方法被回调多次  该方法中尽量少做操作 需要尽快返回 不然会报错
     @Override
     public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
         // 设备搜索完毕
@@ -204,14 +212,6 @@ public class MainActivity extends AppCompatActivity implements KeysSelectDialog.
                 }
                 //如果不存在 就放进集合中
                 if (!exist) {
-                    mbBlueToothKeys
-                            .add(new BlueToothKey(
-                                    device,
-                                    BlueToothKey.KeyConnectState.无连接.getValue(),
-                                    false));
-                }
-                //TODO
-                if (mbBlueToothKeys.size() == 0) {
                     mbBlueToothKeys
                             .add(new BlueToothKey(
                                     device,

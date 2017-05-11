@@ -244,6 +244,15 @@ public class BluetoothLeClass {
 		return connect(mBluetoothDeviceAddress);
 	}
 
+	//确定蓝牙是否打开 如果没有打开提示用户打开蓝牙 如果已经是打开状态则不会开启
+	public void isEnabled(Context context) {
+		if (mBluetoothAdapter == null) {
+			return;
+		}
+		if (!mBluetoothAdapter.isEnabled()) {
+            mBluetoothAdapter.enable();
+        }
+	}
 	/*
 	 * 根据address连接蓝牙设备
 	 * Connects to the GATT server hosted on the Bluetooth LE device.
