@@ -79,6 +79,10 @@ public class MainActivity extends AppCompatActivity implements KeysSelectDialog.
         mBLE.setOnDisconnectListener(this);//ble断开连接回调
         mBLE.setOnServiceDiscoverListener(this);//搜索服务回调
         mBLE.setOnDataAvailableListener(this);//从蓝牙设备读取信息回调
+        //日志记录
+        Logger.createDataLoggerFile(MainActivity.this);
+        //删除上一次记录  每次进入app就删除上一次操作的记录，
+        Logger.delect();
     }
 
     @Override
@@ -88,8 +92,8 @@ public class MainActivity extends AppCompatActivity implements KeysSelectDialog.
                 startBluetooth();
                 break;
             case R.id.btnScan:
-                //点击搜索附近蓝牙设备
                 keysSelectDialog.showDialog();
+                //点击搜索附近蓝牙设备
                 startBluetooth();
                 break;
             default:
@@ -221,6 +225,7 @@ public class MainActivity extends AppCompatActivity implements KeysSelectDialog.
             @Override
             public void run() {
                 if (!TextUtils.isEmpty(name)) {
+                    Logger.savelog("连接到设备的:" + name);
                     mName.setText("连接到设备:" + name);
                 } else {
                     mName.setText("连接到设备:--");

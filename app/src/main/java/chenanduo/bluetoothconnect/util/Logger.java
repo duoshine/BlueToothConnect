@@ -94,7 +94,7 @@ public class Logger {
 
     }
 
-    public static void datalog(String message) {
+    public static void savelog(String message) {
         // show(Log.INFO, mLogTag, message);
         saveLogData(message);
     }
@@ -184,7 +184,6 @@ public class Logger {
             /**
              * File  name
              */
-
             mDataLoggerFile = new File(mDataLoggerDirectory.getAbsoluteFile() + File.separator
                     + GetDate() + context.getResources().getString(R.string.dl_file_extension));
             if (!mDataLoggerFile.exists()) {
@@ -201,20 +200,46 @@ public class Logger {
         /**
          * Delete old file
          */
-        File[] allFilesList = mDataLoggerDirectory.listFiles();
+       File[] allFilesList = mDataLoggerDirectory.listFiles();
         long cutoff = System.currentTimeMillis() - (7 * 24 * 60 * 60 * 1000);
         for (int pos = 0; pos < allFilesList.length; pos++) {
             File currentFile = allFilesList[pos];
             if (currentFile.lastModified() < cutoff) {
                 currentFile.delete();
             }
-
         }
         mDataLoggerOldFile = new File(mDataLoggerDirectory.getAbsoluteFile() + File.separator
                 + GetDateSevenDaysBack() +
                 mContext.getResources().getString(R.string.dl_file_extension));
         if (mDataLoggerOldFile.exists()) {
+            Logger.d("删除了");
             mDataLoggerOldFile.delete();
+        }
+    }
+
+    public static void delect(){
+        deleteFile(mDataLoggerFile);
+    }
+
+    private static void deleteFile(File file) {
+        if (file.isFile())
+        {
+            file.delete();
+            return;
+        }
+        if (file.isDirectory())
+        {
+            File[] childFile = file.listFiles();
+            if (childFile == null || childFile.length == 0)
+            {
+                file.delete();
+                return;
+            }
+            for (File f : childFile)
+            {
+                deleteFile(f);
+            }
+            file.delete();
         }
     }
 
@@ -228,7 +253,6 @@ public class Logger {
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
         Calendar calendar = Calendar.getInstance();
         return formatter.format(calendar.getTime());
-
     }
 
     private static void saveLogData(String message) {
@@ -251,7 +275,6 @@ public class Logger {
             fbw.newLine();
             fbw.flush();
             fbw.close();
-
         } catch (IOException e) {
             e.printStackTrace();
         } catch (Exception e) {
@@ -287,3 +310,4 @@ public class Logger {
 
     }
 }
+
