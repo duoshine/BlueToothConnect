@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements KeysSelectDialog.
     private BluetoothGattCharacteristic notifyCharacteristic;
     private Button mBtnScan;
     private TextView mName;
+    private long mStartTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -174,26 +175,6 @@ public class MainActivity extends AppCompatActivity implements KeysSelectDialog.
         keysSelectDialog.dismiss();
     }
 
-    //连接设备成功回调
-    @Override
-    public void onConnect(BluetoothGatt gatt) {
-        //搜索连接设备所支持的service  需要连接上才可以 这个方法是异步操作 在回调函数onServicesDiscovered中得到status
-        //通过判断status是否等于BluetoothGatt.GATT_SUCCESS来判断查找Service是否成功
-        gatt.discoverServices();
-        final String name = gatt.getDevice().getName();
-        //更新连接后界面
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (!TextUtils.isEmpty(name)) {
-                    mName.setText("连接到设备:" + name);
-                } else {
-                    mName.setText("连接到设备:--");
-                }
-            }
-        });
-    }
-
     //扫描结果回调  该方法被回调多次  该方法中尽量少做操作 需要尽快返回 不然会报错
     @Override
     public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
@@ -226,10 +207,44 @@ public class MainActivity extends AppCompatActivity implements KeysSelectDialog.
         });
     }
 
+
+    //连接设备成功回调
+    @Override
+    public void onConnect(BluetoothGatt gatt) {
+        //mStartTime = System.currentTimeMillis();
+        //搜索连接设备所支持的service  需要连接上才可以 这个方法是异步操作 在回调函数onServicesDiscovered中得到status
+        //通过判断status是否等于BluetoothGatt.GATT_SUCCESS来判断查找Service是否成功
+        gatt.discoverServices();
+        final String name = gatt.getDevice().getName();
+        //更新连接后界面
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (!TextUtils.isEmpty(name)) {
+                    mName.setText("连接到设备:" + name);
+                } else {
+                    mName.setText("连接到设备:--");
+                }
+            }
+        });
+    }
+
+
     //断开设备连接后回调
     @Override
     public void onDisconnect(BluetoothGatt gatt) {
-        //每次断开连接都close
+        /*//小于1秒内断开视为自动断开 自动重新连接
+        long endTime = System.currentTimeMillis();
+        if (endTime - mStartTime < 1000) {
+            //连接蓝牙
+            Logger.d("小于1000ms自动重连设备");
+            if ("null".equals(mbBlueToothKey.device.getAddress())) {
+                return;
+            }
+            mBLE.connect(mbBlueToothKey.device.getAddress());
+        }*/
+
+        //每次断开连接都close  如果每次断开连接都close那么就无法实现上面的自动重连 不close好像有bug
         mBLE.close();
         runOnUiThread(new Runnable() {
             @Override
