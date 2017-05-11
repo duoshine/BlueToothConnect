@@ -105,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements KeysSelectDialog.
         if (mBLE == null) {
             return;
         }
+        Logger.savelog("开始扫描设备");
         //点击搜索时确定蓝牙是否打开 如果没有打开提示用户打开蓝牙 如果已经是打开状态则不会开启
         mBLE.isEnabled(MainActivity.this);
         //点击搜索附近蓝牙设备
@@ -127,9 +128,11 @@ public class MainActivity extends AppCompatActivity implements KeysSelectDialog.
     //6.0权限机制  蓝牙要精确定位位置
     private void requestPermission() {
         if (Build.VERSION.SDK_INT >= 23) {
-            int checkAccessFinePermission = ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
-            if (checkAccessFinePermission != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+            int checkAccessFinePermission = ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);//位置
+            int sdPermission = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);//sd
+            if (checkAccessFinePermission != PackageManager.PERMISSION_GRANTED ||sdPermission != PackageManager.PERMISSION_GRANTED ) {
+                String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.WRITE_EXTERNAL_STORAGE};
+                ActivityCompat.requestPermissions(this, permissions,
                         REQUEST_PERMISSION_ACCESS_LOCATION);
                 return;
             } else {
