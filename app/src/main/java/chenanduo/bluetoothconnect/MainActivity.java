@@ -135,11 +135,7 @@ public class MainActivity extends AppCompatActivity implements KeysSelectDialog.
                 ActivityCompat.requestPermissions(this, permissions,
                         REQUEST_PERMISSION_ACCESS_LOCATION);
                 return;
-            } else {
-                /**
-                 * 如果已经有该权限则开始搜索设备
-                 */
-                mBLE.startScanDevices(true, this);
+
             }
         }
     }
@@ -152,9 +148,9 @@ public class MainActivity extends AppCompatActivity implements KeysSelectDialog.
             case REQUEST_PERMISSION_ACCESS_LOCATION: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     /**
-                     * 用户同意授权开始搜索设备
+                     * 用户同意授权
                      */
-                    mBLE.startScanDevices(true, this);
+
                 } else {
                     //用户拒绝授权 则给用户提示没有权限功能无法使用，
                     toast("拒绝授权 蓝牙功能无法使用");
